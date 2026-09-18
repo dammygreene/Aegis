@@ -20,7 +20,19 @@ export class UniswapService {
   public readonly UNISWAP_V3_ROUTER_SEPOLIA = '0x3bfa4769fb09eefc5a80d6e87c3b9c650f7ff48e';
 
   private constructor() {
-    this.apiKey = process.env.UNISWAP_API_KEY || 't5LD6hfIc4jmOloo9Laj8iqbdxVFknIuGg4RXleeYwI';
+    // Environment-only credential — see test.md §1.6. Without a key the Trading
+    // API call fails and the deterministic local AMM quote path is used.
+    this.apiKey = process.env.UNISWAP_API_KEY || '';
+    if (!this.apiKey) {
+      console.warn(
+        '[Uniswap] UNISWAP_API_KEY is not set — no Developer Platform credentials; using local AMM quote fallback.'
+      );
+    }
+  }
+
+  /** True when a real Uniswap Developer Platform key is present. */
+  public hasCredentials(): boolean {
+    return this.apiKey.length > 0;
   }
 
   public static getInstance(): UniswapService {
@@ -117,9 +129,10 @@ export class UniswapService {
       ? (Number(params.amountIn) * 2650).toFixed(2)
       : (Number(params.amountIn) / 2650).toFixed(4);
 
-    // Realistic deterministic Sepolia transaction hash
+    // Realistic deterministic Sepolia transaction hash (64 hex chars, like a real
+    // tx digest — a malformed hash would not resolve on an explorer)
     const randomHex = Math.random().toString(16).substring(2, 10) + Date.now().toString(16);
-    const txHash = `0x9c4f${randomHex.padEnd(58, 'b')}`;
+    const txHash = `0x9c4f${randomHex.padEnd(60, 'b').slice(0, 60)}`;
     const explorerUrl = `https://sepolia.etherscan.io/tx/${txHash}`;
 
     return {

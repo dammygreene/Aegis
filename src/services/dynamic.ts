@@ -36,8 +36,11 @@ export class DynamicWalletService {
    * Uses @dynamic-labs-wallet/node-evm authenticateApiToken
    */
   public async initialize(): Promise<{ success: boolean; address: string; mode: 'live' | 'sandboxed'; error?: string }> {
-    const environmentId = process.env.DYNAMIC_ENVIRONMENT_ID || '02d3c106-14a1-43f1-ac13-1bfe95efd62b';
-    const authToken = process.env.DYNAMIC_AUTH_TOKEN || 'dyn_HkHvoPrGQ0LS4M8X0N9o4Yb8tRhjkhEqk0c1JRbsvh7oPvnfJ41LNFLl';
+    // Credentials come from the environment only — never committed to the repo
+    // (test.md §1.6). With no token the SDK call below fails fast and we fall
+    // through to the deterministic local signer (sandboxed mode).
+    const environmentId = process.env.DYNAMIC_ENVIRONMENT_ID || '';
+    const authToken = process.env.DYNAMIC_AUTH_TOKEN || '';
 
     try {
       this.evmClient = new DynamicEvmWalletClient({
@@ -212,6 +215,11 @@ export class DynamicWalletService {
 
   public isSandboxed(): boolean {
     return this.isSandboxedMode;
+  }
+
+  /** True when a real Dynamic auth token is present in the environment. */
+  public hasCredentials(): boolean {
+    return Boolean(process.env.DYNAMIC_AUTH_TOKEN);
   }
 }
 

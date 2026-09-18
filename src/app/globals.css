@@ -5,27 +5,141 @@
 :root {
   --background: #080c14;
   --foreground: #f8fafc;
+  --hairline: rgba(148, 163, 184, 0.1);
+  --hairline-strong: rgba(148, 163, 184, 0.18);
+  --spring: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   overflow-x: hidden;
 }
 
 /* Custom scrollbar for dark terminal */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: #0b111d;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 3px;
+  background: #243149;
+  border-radius: 999px;
+  border: 2px solid #0b111d;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #35476a;
+}
+
+@layer base {
+  /* Numbers that carry trust signals get the display face + tabular figures */
+  .num {
+    font-family: 'Inter Tight', 'Space Grotesk', 'SF Pro Display', 'Inter',
+      system-ui, sans-serif;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1, 'cv05' 1;
+    letter-spacing: -0.015em;
+  }
+
+  /* Small uppercase metadata labels */
+  .label {
+    font-size: 0.625rem;
+    line-height: 1rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* Monospace is reserved for hashes, addresses and raw values */
+  .hash {
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, Monaco, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  /* Layered premium surfaces instead of flat dark boxes */
+  .panel {
+    @apply relative rounded-2xl border border-hairline bg-ink-850/80 bg-panel-raise shadow-panel;
+  }
+
+  .panel-raised {
+    @apply relative rounded-2xl border border-hairlineStrong bg-ink-800/85 bg-panel-raise shadow-panel-lg;
+  }
+
+  /* Recessed wells for grouped metrics */
+  .well {
+    @apply rounded-xl border border-hairline bg-ink-950/70 shadow-inset;
+  }
+
+  /* Interactive surfaces get a soft focus/hover lift, never a hard outline */
+  .panel-interactive {
+    @apply panel transition-all duration-300 ease-spring hover:border-hairlineStrong hover:shadow-panel-lg;
+  }
+
+  /* The causal-chain thread: one accent color reused for every connector */
+  .chain-rail {
+    @apply absolute bg-rail-signal;
+    width: 2px;
+    border-radius: 999px;
+    opacity: 0.85;
+  }
+
+  .chain-node {
+    @apply relative flex items-center justify-center rounded-full font-mono font-bold;
+  }
+}
+
+@layer utilities {
+  .hairline {
+    border-color: var(--hairline);
+  }
+
+  /* Live vs staged state, expressed as border + glow, not only badge text */
+  .state-live {
+    @apply border-live/30 shadow-glow-live;
+  }
+  .state-staged {
+    @apply border-staged/30 shadow-glow-staged;
+  }
+
+  .ambient-grid {
+    background-image: linear-gradient(
+        rgba(148, 163, 184, 0.045) 1px,
+        transparent 1px
+      ),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.045) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(circle at 50% 0%, black, transparent 72%);
+  }
+
+  .flow-sheen {
+    background-image: linear-gradient(
+      90deg,
+      rgba(56, 189, 248, 0) 0%,
+      rgba(56, 189, 248, 0.75) 40%,
+      rgba(16, 185, 129, 0.75) 60%,
+      rgba(129, 140, 248, 0) 100%
+    );
+    background-size: 220% 100%;
+  }
+
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-900;
+  }
+}
+
+/* Motion stays subtle — and honors users who ask for none */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
