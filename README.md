@@ -20,25 +20,25 @@ As required by each sponsor track checklist, here are the exact files and lines 
 
 ### 1. Uniswap Integration (`Uniswap Track`)
 - **Integration File:** [`src/services/uniswap.ts`](src/services/uniswap.ts)
-  - `UniswapService.getQuote()` (Lines 37–82): Hits the official Uniswap Trading API (`https://trade-api.gateway.uniswap.org/v1/quote`) using developer platform credentials (`x-api-key`).
-  - `UniswapService.executeSwap()` (Lines 87–134): Prepares and executes automated token swaps and liquidity rebalancing on **Ethereum Sepolia** (ChainId: `11155111`), outputting real transaction hashes and explorer links to Sepolia Etherscan.
+  - `UniswapService.getQuote()` (Lines 48–101): Hits the official Uniswap Trading API (`https://trade-api.gateway.uniswap.org/v1/quote`) using developer platform credentials (`x-api-key`).
+  - `UniswapService.executeSwap()` (Lines 106–153): Prepares and executes automated token swaps and liquidity rebalancing on **Ethereum Sepolia** (ChainId: `11155111`), outputting real transaction hashes and explorer links to Sepolia Etherscan.
 - **Developer Platform Feedback:** [`FEEDBACK.md`](FEEDBACK.md) contains full developer feedback, SDK analysis, and responses to the Uniswap Developer Feedback Form.
 
 ### 2. Dynamic Server Wallet Integration (`Dynamic Track`)
 - **Integration File:** [`src/services/dynamic.ts`](src/services/dynamic.ts)
   - **Documented Pattern:** Server Wallets via `@dynamic-labs-wallet/node-evm` and `@dynamic-labs-wallet/node`.
-  - `DynamicWalletService.initialize()` (Lines 41–84): Authenticates using `DynamicEvmWalletClient.authenticateApiToken()` and initializes a 2-of-2 MPC Threshold Signature account (`ThresholdSignatureScheme.TWO_OF_TWO`).
-  - `DynamicWalletService.checkSpendCap()` (Lines 90–108): Hard-coded, programmatic spend cap enforcement (`MAX_AGENT_SPEND_CAP_USD = $50.00`). Completely halts execution and raises a `SPEND_CAP_EXCEEDED` exception if any requested action exceeds the limit.
-  - `DynamicWalletService.signTypedData()` (Lines 144–176): Signs EIP-712 typed data payloads for Definitive Flash orders using the Dynamic MPC wallet.
-  - `DynamicWalletService.signMessage()` (Lines 181–201): Cryptographic message signing for agent authorizations and machine payments.
+  - `DynamicWalletService.initialize()` (Lines 38–88): Authenticates using `DynamicEvmWalletClient.authenticateApiToken()` and initializes a 2-of-2 MPC Threshold Signature account (`ThresholdSignatureScheme.TWO_OF_TWO`).
+  - `DynamicWalletService.checkSpendCap()` (Lines 94–110): Hard-coded, programmatic spend cap enforcement (`MAX_AGENT_SPEND_CAP_USD = $50.00`). Completely halts execution and raises a `SPEND_CAP_EXCEEDED` exception if any requested action exceeds the limit.
+  - `DynamicWalletService.signTypedData()` (Lines 148–177): Signs EIP-712 typed data payloads for Definitive Flash orders using the Dynamic MPC wallet.
+  - `DynamicWalletService.signMessage()` (Lines 182–198): Cryptographic message signing for agent authorizations and machine payments.
 
 ### 3. Definitive Flash Execution (`Definitive Flash Track`)
 - **Integration File:** [`src/services/flash.ts`](src/services/flash.ts)
   - **Venue & Network:** Definitive Flash REST API on **Base Mainnet** (ChainId: `8453`).
   - **Advanced Order Type:** **Bracket Order** (`orderType: "bracket"` with `attachedBracket: { takeProfit, stopLoss }`).
-  - `DefinitiveFlashService.getBracketQuote()` (Lines 38–144): Requests real-time pricing and signable EIP-712 payloads from `https://flash.definitive.fi/v1/quote`.
-  - `DefinitiveFlashService.executeBracketOrder()` (Lines 149–235): Signs the primary order typed data AND the attached bracket typed data using the Dynamic Server Wallet, then submits to `https://flash.definitive.fi/v1/order`.
-  - **Non-Negotiable Live Money Safeguard:** Line 6 & Line 40 enforce `MAX_LIVE_ORDER_USD = 20`. This dumb, unconditional safety assertion stops any order larger than $20 before real capital moves on mainnet.
+  - `DefinitiveFlashService.getBracketQuote()` (Lines 116–247): Requests real-time pricing and signable EIP-712 payloads from `https://flash.definitive.fi/v1/quote`.
+  - `DefinitiveFlashService.executeBracketOrder()` (Lines 282–393): Signs the primary order typed data AND the attached bracket typed data using the Dynamic Server Wallet, then submits to `https://flash.definitive.fi/v1/order`.
+  - **Non-Negotiable Live Money Safeguard:** Line 6 declares `MAX_LIVE_ORDER_USD = 20`, and it is enforced twice independently of any decision logic — once at Line 118 (before quoting) and again at Line 284 (before submission). This dumb, unconditional safety assertion stops any order larger than $20 before real capital moves on mainnet.
 
 ### 4. Machine Payments (x402 Tier 2 Flourish)
 - **Integration Files:** [`src/services/x402.ts`](src/services/x402.ts) & [`src/app/api/oracle/volatility/route.ts`](src/app/api/oracle/volatility/route.ts)
@@ -79,13 +79,66 @@ As required by each sponsor track checklist, here are the exact files and lines 
 
 ## Visual Design & UX Highlights
 
-Built according to `aegis-design-prompt.md`:
-- **Single Vertical Feed:** Clean, dark trading-terminal aesthetic with monospace metrics, glowing accent connectors, and unified causal cards.
-- **Unmissable Network Badges:** Color-coded badges make network honesty transparent:
-  - 🟢 **Base Mainnet (Live)** for the Definitive Flash leg.
-  - 🟡 **Ethereum Sepolia (Testnet)** for the Uniswap leg.
-- **Dynamic Spend Cap Meter:** Real-time visual progress bar showing `$currentSpend / $50.00` with hard safety ceiling alerts.
-- **Deep Inspection:** Expandable cryptographic drawer displaying raw EIP-712 typed data payloads, domains, messages, and ECDSA signatures.
+Built to `aegis-design-prompt.md`, then elevated by the premium styling pass in
+`aegis-ui-styling-prompt.md` (dials: DESIGN_VARIANCE 3-4 · MOTION_INTENSITY 3-4 ·
+VISUAL_DENSITY 5-6 — styling and layout only, no behavior change):
+
+- **One continuous causal chain:** the three steps sit on a single visible rail with
+  directional flow indicators — a horizontal rail with chevrons in the orientation
+  strip, a vertical rail with numbered nodes inside each cycle. The chain reads as
+  one flow, not three widgets.
+- **Trust numbers lead the hierarchy:** `DYNAMIC SPEND CAP` and `SAFETY CEILING` use
+  the display face at 3xl with tabular figures; status chips are deliberately quiet
+  beneath them.
+- **Live vs staged is visible without reading text:** consistent color coding on
+  borders, glows, dots and badges — 🟢 **Base Mainnet (live)** for the Definitive
+  Flash leg, 🟡 **Ethereum Sepolia (staged)** for the Uniswap leg.
+- **Typography with a real hierarchy:** one display face for key numbers (spend cap,
+  amounts, metric vs threshold), Inter for labels/prose, and monospace reserved for
+  hashes, addresses and raw values.
+- **Layered surfaces instead of flat boxes:** soft elevation, hairline borders,
+  recessed metric wells, and subtle spring transitions on state changes
+  (`cubic-bezier(0.16, 1, 0.3, 1)`), all disabled under `prefers-reduced-motion`.
+- **Agent Thesis gets real presence:** the plain-language reasoning is a quoted,
+  accent-edged card rather than one more dense text block.
+- **Deep inspection:** expandable cryptographic drawer displaying raw EIP-712 typed
+  data payloads, domains, messages, and ECDSA signatures.
+
+Design tokens live in `tailwind.config.ts`; shared surface/typography utilities in
+`src/app/globals.css`.
+
+---
+
+## Testing & Verification
+
+The checklist in [`test.md`](test.md) is implemented as an executable suite plus an
+evidence log. Run it with:
+
+```bash
+npm test          # single run, used in CI
+npm run test:watch
+```
+
+| Suite | Covers |
+|---|---|
+| `tests/credentials.test.ts` | §1.6 no committed secrets, placeholder-only `.env.example`, env-only credential reads |
+| `tests/dynamic-wallet.test.ts` | §2.1–2.4 wallet init, signature recovery/verification, spend-cap enforcement |
+| `tests/flash-safety.test.ts` | §4.1/§4.3/§4.5 + §6.2 live-order ceiling, no retry/resubmit, quote-expiry handling |
+| `tests/agent-chain.test.ts` | §5.1/§5.2/§6.1 full chain per scenario, network-label accuracy, graceful over-cap abort |
+| `tests/x402-payment.test.ts` | machine-payment flow and the HTTP 402 oracle contract |
+| `tests/api-routes.test.ts` | route contract for the feed UI, safeguard error path, RPC probe |
+| `tests/rpc.test.ts` | §1.4/§1.5/§6.3 `eth_blockNumber` probe, bounded retries, timeout instead of hang |
+| `tests/repo-artifacts.test.ts` | §3.3 submission artifacts and doc-link integrity |
+
+**[`TEST_LOG.md`](TEST_LOG.md)** records the actual result of every checklist item,
+including the items that cannot be run from a sandbox with no outbound egress, and
+what was fixed when a test failed. Items requiring live mainnet capital, a browser,
+or an external API key are marked BLOCKED there rather than claimed as passing.
+
+> **Security note:** all credentials are read from the environment only. Earlier
+> revisions of this repo contained literal API keys as fallback defaults; they were
+> removed on 2026-09-18 and those keys must be treated as compromised and rotated.
+> `tests/credentials.test.ts` fails the build if a real credential is committed again.
 
 ---
 

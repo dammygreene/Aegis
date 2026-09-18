@@ -75,10 +75,12 @@ export interface SystemStatus {
   dynamic: {
     authenticated: boolean;
     environmentId: string;
+    credentialsPresent: boolean;
     walletAddress: string;
     walletPattern: string;
     spendCapUsd: number;
     spentUsd: number;
+    remainingUsd: number;
     mode: 'live' | 'sandboxed';
   };
   flash: {
@@ -100,4 +102,16 @@ export interface SystemStatus {
     sepoliaUrl: string;
     baseMainnetUrl: string;
   };
+  /** Present only for GET /api/status?probe=rpc */
+  rpcProbe?: Record<
+    string,
+    {
+      url: string;
+      ok: boolean;
+      blockNumber?: number;
+      latencyMs?: number;
+      attempts: number;
+      error?: string;
+    }
+  >;
 }
