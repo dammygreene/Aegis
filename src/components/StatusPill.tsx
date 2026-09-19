@@ -1,9 +1,12 @@
 import { cn } from '@/lib/cn';
 
 /**
- * Secondary status chip. Deliberately visually quiet: after the styling pass the
- * spend cap / safety ceiling numbers are the loudest things in the top bar, and
- * status chips sit a clear step below them in the hierarchy.
+ * Secondary status chip — Vault palette styling.
+ * Uses flat colors:
+ *   signal: border #CBA135, text #CBA135
+ *   live:   border #3E7A5B, text #3E7A5B
+ *   staged: border #8A7B4E, text #8A7B4E
+ *   neutral: border #2A2E35, text #9B9690
  */
 export function StatusPill({
   children,
@@ -17,12 +20,13 @@ export function StatusPill({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 rounded-full border px-2 py-[2px]',
+        'inline-flex items-center gap-1 border px-2 py-[2px] bg-[#14161A]',
         'label hash normal-case',
-        tone === 'signal' && 'border-sky-500/25 bg-sky-500/[0.07] text-sky-300/90',
-        tone === 'live' && 'border-emerald-500/25 bg-emerald-500/[0.07] text-emerald-300/90',
-        tone === 'staged' && 'border-amber-500/25 bg-amber-500/[0.07] text-amber-300/90',
-        tone === 'neutral' && 'border-hairline bg-ink-950/60 text-slate-400',
+        'rounded-r-full rounded-l-[3px]',
+        tone === 'signal' && 'border-[#CBA135]/40 text-[#CBA135]',
+        tone === 'live' && 'border-[#3E7A5B]/50 text-[#3E7A5B]',
+        tone === 'staged' && 'border-[#8A7B4E]/50 text-[#8A7B4E]',
+        tone === 'neutral' && 'border-[#2A2E35] text-[#9B9690]',
         className
       )}
     >

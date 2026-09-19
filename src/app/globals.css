@@ -3,45 +3,55 @@
 @tailwind utilities;
 
 :root {
-  --background: #080c14;
-  --foreground: #f8fafc;
-  --hairline: rgba(148, 163, 184, 0.1);
-  --hairline-strong: rgba(148, 163, 184, 0.18);
+  --background: #14161A;
+  --foreground: #EDE7DD;
+  --hairline: #2A2E35;
+  --hairline-strong: rgba(203, 161, 53, 0.25);
   --spring: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Vault Palette */
+  --vault-bg: #14161A;
+  --vault-surface: #1C1F24;
+  --vault-border: #2A2E35;
+  --vault-primary: #CBA135;
+  --vault-secondary: #8C5A2B;
+  --vault-text: #EDE7DD;
+  --vault-muted: #9B9690;
+  --vault-live: #3E7A5B;
+  --vault-staged: #8A7B4E;
+  --vault-danger: #9C3B2E;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family: var(--font-sans), 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   overflow-x: hidden;
 }
 
-/* Custom scrollbar for dark terminal */
+/* Custom scrollbar — warm gunmetal */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b111d;
+  background: #14161A;
 }
 ::-webkit-scrollbar-thumb {
-  background: #243149;
+  background: #2A2E35;
   border-radius: 999px;
-  border: 2px solid #0b111d;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #35476a;
+  background: #353A42;
 }
 
 @layer base {
-  /* Numbers that carry trust signals get the display face + tabular figures */
+  /* Numbers — Space Grotesk display face with tabular figures */
   .num {
-    font-family: 'Inter Tight', 'Space Grotesk', 'SF Pro Display', 'Inter',
-      system-ui, sans-serif;
+    font-family: var(--font-display), 'Space Grotesk', 'SF Pro Display', system-ui, sans-serif;
     font-variant-numeric: tabular-nums;
-    font-feature-settings: 'tnum' 1, 'cv05' 1;
-    letter-spacing: -0.015em;
+    font-feature-settings: 'tnum' 1;
+    letter-spacing: -0.02em;
   }
 
   /* Small uppercase metadata labels */
@@ -50,10 +60,10 @@ body {
     line-height: 1rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    font-weight: 600;
+    font-weight: 700;
   }
 
-  /* Monospace is reserved for hashes, addresses and raw values */
+  /* Monospace — hashes, addresses, raw data only */
   .hash {
     font-family: 'JetBrains Mono', 'SF Mono', Menlo, Monaco, monospace;
     font-variant-numeric: tabular-nums;
@@ -61,33 +71,29 @@ body {
 }
 
 @layer components {
-  /* Layered premium surfaces instead of flat dark boxes */
+  /* ── Flat Vault Surfaces ──────────────────────────────────────── */
+
   .panel {
-    @apply relative rounded-2xl border border-hairline bg-ink-850/80 bg-panel-raise shadow-panel;
+    @apply relative rounded-2xl border border-[#2A2E35] bg-[#1C1F24] shadow-panel;
   }
 
   .panel-raised {
-    @apply relative rounded-2xl border border-hairlineStrong bg-ink-800/85 bg-panel-raise shadow-panel-lg;
+    @apply relative rounded-2xl border border-[rgba(203,161,53,0.25)] bg-[#1C1F24] shadow-panel-lg;
   }
 
-  /* Recessed wells for grouped metrics */
+  .card {
+    @apply relative rounded-xl border border-[#2A2E35] bg-[#1C1F24] shadow-panel-sm;
+  }
+
   .well {
-    @apply rounded-xl border border-hairline bg-ink-950/70 shadow-inset;
+    @apply rounded-lg border border-[#2A2E35] bg-[#14161A] shadow-inset;
   }
 
-  /* Interactive surfaces get a soft focus/hover lift, never a hard outline */
   .panel-interactive {
-    @apply panel transition-all duration-300 ease-spring hover:border-hairlineStrong hover:shadow-panel-lg;
+    @apply panel transition-all duration-300 ease-spring hover:border-[#CBA135]/40;
   }
 
-  /* The causal-chain thread: one accent color reused for every connector */
-  .chain-rail {
-    @apply absolute bg-rail-signal;
-    width: 2px;
-    border-radius: 999px;
-    opacity: 0.85;
-  }
-
+  /* Structural chain node — flat color borders and backgrounds */
   .chain-node {
     @apply relative flex items-center justify-center rounded-full font-mono font-bold;
   }
@@ -95,44 +101,99 @@ body {
 
 @layer utilities {
   .hairline {
-    border-color: var(--hairline);
+    border-color: #2A2E35;
   }
 
-  /* Live vs staged state, expressed as border + glow, not only badge text */
+  /* Live vs staged state — flat borders + single-color soft glow */
   .state-live {
-    @apply border-live/30 shadow-glow-live;
+    border-color: #3E7A5B;
+    box-shadow: 0 0 12px rgba(62, 122, 91, 0.15);
   }
   .state-staged {
-    @apply border-staged/30 shadow-glow-staged;
+    border-color: #8A7B4E;
+    box-shadow: 0 0 12px rgba(138, 123, 78, 0.15);
+  }
+
+  /* Blueprint wireframe for staged testnet — flat border with subtle pattern */
+  .blueprint-grid {
+    background-color: #14161A;
+    background-image: radial-gradient(#2A2E35 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+
+  /* Obsidian deep panel for live mainnet — flat solid obsidian */
+  .obsidian-panel {
+    background-color: #181B20;
+    box-shadow:
+      0 12px 32px rgba(0, 0, 0, 0.8),
+      0 0 0 1px rgba(62, 122, 91, 0.35),
+      0 0 20px rgba(62, 122, 91, 0.10);
   }
 
   .ambient-grid {
-    background-image: linear-gradient(
-        rgba(148, 163, 184, 0.045) 1px,
-        transparent 1px
-      ),
-      linear-gradient(90deg, rgba(148, 163, 184, 0.045) 1px, transparent 1px);
-    background-size: 56px 56px;
-    mask-image: radial-gradient(circle at 50% 0%, black, transparent 72%);
-  }
-
-  .flow-sheen {
-    background-image: linear-gradient(
-      90deg,
-      rgba(56, 189, 248, 0) 0%,
-      rgba(56, 189, 248, 0.75) 40%,
-      rgba(16, 185, 129, 0.75) 60%,
-      rgba(129, 140, 248, 0) 100%
-    );
-    background-size: 220% 100%;
+    background-image: radial-gradient(rgba(42, 46, 53, 0.5) 1px, transparent 1px);
+    background-size: 32px 32px;
   }
 
   .focus-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-900;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CBA135]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#14161A];
   }
 }
 
-/* Motion stays subtle — and honors users who ask for none */
+/* ── Shield glow — single-color brass aura at low opacity ───────── */
+
+.aegis-shield-mark {
+  position: relative;
+}
+
+.aegis-shield-mark::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border-radius: 20px;
+  background: radial-gradient(circle, rgba(203, 161, 53, 0.15) 0%, transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ── Chain-step loading sequence ─────────────────────────────────── */
+
+@keyframes step-light-up {
+  0%   { opacity: 0.3; transform: scale(0.92); }
+  40%  { opacity: 1;   transform: scale(1.06); }
+  100% { opacity: 0.5; transform: scale(1); }
+}
+
+.chain-step-loading-1 { animation: step-light-up 1.6s ease-in-out infinite; }
+.chain-step-loading-2 { animation: step-light-up 1.6s ease-in-out 0.35s infinite; }
+.chain-step-loading-3 { animation: step-light-up 1.6s ease-in-out 0.7s infinite; }
+
+/* ── Trust numbers: display typography ──────────────────────────── */
+
+.trust-hero-value {
+  font-family: var(--font-display), 'Space Grotesk', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+/* ── Mobile responsiveness ───────────────────────────────────────── */
+
+@media (max-width: 639px) {
+  .trust-hero-value {
+    font-size: clamp(1.5rem, 7vw, 2.25rem);
+  }
+
+  .aegis-btn-trigger {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  .aegis-select-trigger {
+    min-height: 44px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

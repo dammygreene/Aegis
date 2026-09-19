@@ -25,6 +25,7 @@
   "dependencies": {
     "@dynamic-labs-wallet/node": "^1.1.13",
     "@dynamic-labs-wallet/node-evm": "^1.1.13",
+    "@phosphor-icons/react": "^2.1.10",
     "@types/node": "^26.6.1",
     "autoprefixer": "^10.6.1",
     "clsx": "^2.1.1",

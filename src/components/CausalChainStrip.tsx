@@ -1,5 +1,7 @@
-import { ArrowRight } from 'lucide-react';
-import { cn } from '@/lib/cn';
+'use client';
+
+import React from 'react';
+import { Broadcast, Lightning, LockSimple, ShieldCheck } from '@phosphor-icons/react';
 
 export type ChainStep = {
   index: number;
@@ -8,96 +10,271 @@ export type ChainStep = {
   tone: 'signal' | 'live' | 'vault';
 };
 
-const toneClass = {
-  signal: {
-    node: 'border-sky-400/50 bg-sky-500/15 text-sky-300 shadow-glow-signal',
-    card: 'hover:border-sky-400/30',
-    kicker: 'text-sky-400',
-  },
-  live: {
-    node: 'border-emerald-400/50 bg-emerald-500/15 text-emerald-300 shadow-glow-live',
-    card: 'hover:border-emerald-400/30',
-    kicker: 'text-emerald-400',
-  },
-  vault: {
-    node: 'border-indigo-400/50 bg-indigo-500/15 text-indigo-300 shadow-glow-vault',
-    card: 'hover:border-indigo-400/30',
-    kicker: 'text-indigo-300',
-  },
-} as const;
+/**
+ * BrandChevronConduit — Structural flow conduit shaped like the Aegis dual-chevron emblem.
+ * Uses flat colors: primary brass (#CBA135) and secondary bronze (#8C5A2B). Zero gradients.
+ */
+function ChevronConduit({ orientation = 'horizontal' }: { orientation?: 'horizontal' | 'vertical' }) {
+  if (orientation === 'vertical') {
+    return (
+      <div className="flex flex-col items-center justify-center py-2 my-1">
+        <svg
+          viewBox="0 0 40 24"
+          fill="none"
+          className="w-9 h-5"
+        >
+          <path
+            d="M6 4L20 18L34 4"
+            stroke="#CBA135"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M12 4L20 12L28 4"
+            stroke="#8C5A2B"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </div>
+    );
+  }
+
+  return (
+    <div className="hidden lg:flex flex-col items-center justify-center self-center px-1 shrink-0">
+      <svg
+        viewBox="0 0 24 48"
+        fill="none"
+        className="w-6 h-11"
+      >
+        <path
+          d="M4 6L18 24L4 42"
+          stroke="#CBA135"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M4 14L14 24L4 34"
+          stroke="#8C5A2B"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </div>
+  );
+}
 
 /**
- * The 15-second judge orientation strip.
- *
- * The whole pitch is "one continuous chain", so the three steps are drawn on a
- * single visible rail with directional flow between them rather than as three
- * unrelated boxes: a horizontal rail + chevrons on desktop, a vertical rail on
- * mobile. Styling only — no data, state or behavior lives in here.
+ * Structural Causal Chain:
+ * Asymmetrical chevron-interlocked flow rendered in flat Vault palette (gunmetal + brass).
+ * - Node 1: Compact Sensory Trigger (Signal & Thesis)
+ * - Node 2: Dominant Execution Engine (Centerpiece)
+ * - Node 3: Cryptographic Trust Gate (Dynamic MPC 2-of-2)
  */
 export function CausalChainStrip({ steps }: { steps: ChainStep[] }) {
+  const signalStep = steps[0];
+  const execStep = steps[1];
+  const vaultStep = steps[2];
+
   return (
-    <div className="relative pt-1">
-      {/* Desktop rail: one thread running through all three nodes */}
-      <div
-        aria-hidden
-        className="hidden md:block absolute left-[16.666%] right-[16.666%] top-[21px] h-[2px] overflow-visible rounded-full bg-rail-flow opacity-70"
-      >
-        <div className="flow-sheen absolute inset-0 animate-flow-x opacity-60" />
-      </div>
+    <div className="w-full">
+      {/* Desktop & Tablet: Asymmetric Chevron Cascade */}
+      <div className="hidden lg:flex items-stretch gap-3 w-full">
+        {/* ── Node 1: Sensory Trigger (Compact, Radar-Sensory) ── */}
+        <div className="flex-[0.85] min-w-[240px] relative rounded-2xl border border-[#2A2E35] bg-[#1C1F24] p-5 shadow-panel flex flex-col justify-between group hover:border-[#CBA135]/40 transition-all duration-200">
+          <div>
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <div className="flex items-center gap-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#14161A] text-[#CBA135] border border-[#2A2E35]">
+                  <Broadcast size={15} weight="bold" />
+                </span>
+                <span className="label text-[#CBA135]">STAGE 01 · SENSORY</span>
+              </div>
+              <span className="num text-[11px] font-mono text-[#9B9690]">REALTIME</span>
+            </div>
 
-      {/* Mobile rail: same thread, vertical */}
-      <div
-        aria-hidden
-        className="md:hidden absolute left-[21px] top-3 bottom-8 w-[2px] rounded-full bg-rail-signal opacity-70"
-      />
+            <h3 className="font-display text-base font-bold text-[#EDE7DD] tracking-tight">
+              {signalStep?.title || 'Signal & Thesis'}
+            </h3>
+            <p className="mt-2 text-xs leading-relaxed text-[#9B9690]">
+              {signalStep?.detail}
+            </p>
+          </div>
 
-      {/* Direction of causality */}
-      <div aria-hidden className="hidden md:block absolute inset-x-0 top-[13px]">
-        <div className="mx-auto flex w-full justify-around px-[24%]">
-          {steps.slice(0, -1).map(step => (
-            <span
-              key={`flow-${step.index}`}
-              className="flex h-[18px] w-[18px] items-center justify-center rounded-full border border-hairline bg-ink-900 text-sky-400"
-            >
-              <ArrowRight className="h-3 w-3" />
-            </span>
-          ))}
+          <div className="mt-4 pt-3 border-t border-[#2A2E35] flex items-center justify-between text-[11px]">
+            <span className="text-[#9B9690] font-mono">Sensory Trigger</span>
+            <span className="text-[#CBA135] font-mono font-medium">Auto-Triggered</span>
+          </div>
+        </div>
+
+        {/* Chevron Conduit 1 */}
+        <ChevronConduit orientation="horizontal" />
+
+        {/* ── Node 2: Multi-Venue Execution (The Dominant Centerpiece) ── */}
+        <div className="flex-[1.4] relative rounded-2xl border border-[#3E7A5B] bg-[#1C1F24] p-5 shadow-panel-lg flex flex-col justify-between group transition-all duration-200">
+          <div>
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <div className="flex items-center gap-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#14161A] text-[#3E7A5B] border border-[#3E7A5B]/50">
+                  <Lightning size={15} weight="bold" />
+                </span>
+                <span className="label text-[#3E7A5B] tracking-wider">STAGE 02 · EXECUTION ENGINE</span>
+              </div>
+              <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#14161A] border border-[#3E7A5B]/40 text-[10px] font-mono text-[#3E7A5B]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#3E7A5B]" />
+                DUAL VENUE
+              </span>
+            </div>
+
+            <h3 className="font-display text-lg font-bold text-[#EDE7DD] tracking-tight">
+              {execStep?.title || 'Multi-Venue Execution'}
+            </h3>
+            <div className="mt-2 text-xs leading-relaxed text-[#EDE7DD]/90">
+              {execStep?.detail}
+            </div>
+          </div>
+
+          {/* Dual Venue Sub-channels */}
+          <div className="mt-4 pt-3 border-t border-[#2A2E35] grid grid-cols-2 gap-2 text-xs">
+            <div className="p-2.5 rounded-xl bg-[#14161A] border border-[#3E7A5B]">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold tracking-wider text-[#3E7A5B] uppercase">Live Mainnet</span>
+                <span className="h-1.5 w-1.5 rounded-full bg-[#3E7A5B]" />
+              </div>
+              <div className="mt-1 font-display font-semibold text-[#EDE7DD]">Definitive Flash</div>
+              <div className="text-[10.5px] text-[#9B9690]">Base Mainnet · Real USD</div>
+            </div>
+
+            <div className="p-2.5 rounded-xl bg-[#14161A] border border-dashed border-[#8A7B4E]">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold tracking-wider text-[#8A7B4E] uppercase">Staged Sandbox</span>
+                <span className="h-1.5 w-1.5 rounded-full bg-[#8A7B4E]" />
+              </div>
+              <div className="mt-1 font-display font-semibold text-[#EDE7DD]">Uniswap V4</div>
+              <div className="text-[10.5px] text-[#9B9690]">Sepolia · Liquidity Pool</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Chevron Conduit 2 */}
+        <ChevronConduit orientation="horizontal" />
+
+        {/* ── Node 3: Cryptographic Vault Capsule (Dynamic MPC 2-of-2) ── */}
+        <div className="flex-[0.95] min-w-[260px] relative rounded-2xl border border-[#8C5A2B] bg-[#1C1F24] p-5 shadow-panel flex flex-col justify-between group hover:border-[#CBA135]/40 transition-all duration-200">
+          <div>
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <div className="flex items-center gap-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#14161A] text-[#CBA135] border border-[#8C5A2B]">
+                  <LockSimple size={15} weight="bold" />
+                </span>
+                <span className="label text-[#CBA135]">STAGE 03 · TRUST GATE</span>
+              </div>
+              <span className="label text-[#8C5A2B] font-mono">2-OF-2 MPC</span>
+            </div>
+
+            <h3 className="font-display text-base font-bold text-[#EDE7DD] tracking-tight">
+              {vaultStep?.title || 'Dynamic Wallet Authorization'}
+            </h3>
+            <p className="mt-2 text-xs leading-relaxed text-[#9B9690]">
+              {vaultStep?.detail}
+            </p>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-[#2A2E35]">
+            <div className="flex items-center justify-between text-[11px] mb-1">
+              <span className="text-[#9B9690] font-medium flex items-center gap-1.5">
+                <ShieldCheck size={14} weight="bold" className="text-[#CBA135]" />
+                Dynamic Enforced Cap
+              </span>
+              <span className="num font-bold text-[#CBA135]">$50.00 Max</span>
+            </div>
+            <div className="text-[10px] text-[#9B9690]">EIP-712 Threshold Signature Gate</div>
+          </div>
         </div>
       </div>
 
-      <ol className="relative grid grid-cols-1 gap-x-4 gap-y-5 md:grid-cols-3 md:gap-5">
-        {steps.map(step => {
-          const tone = toneClass[step.tone];
-          return (
-            <li key={step.index} className="flex gap-3.5 md:flex-col md:items-center md:text-center">
-              <span
-                aria-hidden
-                className={cn(
-                  'chain-node h-10 w-10 shrink-0 border text-[13px] md:mb-3',
-                  tone.node
-                )}
-              >
-                {step.index}
+      {/* Mobile: Vertical Stack with Downward Conduits */}
+      <div className="lg:hidden flex flex-col gap-1 w-full">
+        {/* Mobile Step 1 */}
+        <div className="relative rounded-2xl border border-[#2A2E35] bg-[#1C1F24] p-4 shadow-panel">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#14161A] text-[#CBA135] border border-[#2A2E35]">
+                <Broadcast size={13} weight="bold" />
               </span>
+              <span className="label text-[#CBA135]">STAGE 01 · SIGNAL</span>
+            </div>
+            <span className="num text-[10px] font-mono text-[#9B9690]">REALTIME</span>
+          </div>
+          <h3 className="font-display text-sm font-bold text-[#EDE7DD] tracking-tight">
+            {signalStep?.title}
+          </h3>
+          <p className="mt-1.5 text-xs text-[#9B9690] leading-snug">
+            {signalStep?.detail}
+          </p>
+        </div>
 
-              <div
-                className={cn(
-                  'flex-1 rounded-xl border border-hairline bg-ink-950/60 px-3.5 py-3',
-                  'bg-panel-raise shadow-panel transition-colors duration-300 ease-spring md:w-full',
-                  tone.card
-                )}
-              >
-                <div className="text-sm font-semibold tracking-tight text-slate-100 font-display">
-                  {step.title}
-                </div>
-                <div className="mt-1 text-[11.5px] leading-relaxed text-slate-400">
-                  {step.detail}
-                </div>
-              </div>
-            </li>
-          );
-        })}
-      </ol>
+        <ChevronConduit orientation="vertical" />
+
+        {/* Mobile Step 2 */}
+        <div className="relative rounded-2xl border border-[#3E7A5B] bg-[#1C1F24] p-4 shadow-panel-lg">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#14161A] text-[#3E7A5B] border border-[#3E7A5B]">
+                <Lightning size={13} weight="bold" />
+              </span>
+              <span className="label text-[#3E7A5B]">STAGE 02 · MULTI-VENUE EXECUTION</span>
+            </div>
+            <span className="h-1.5 w-1.5 rounded-full bg-[#3E7A5B]" />
+          </div>
+          <h3 className="font-display text-sm font-bold text-[#EDE7DD] tracking-tight">
+            {execStep?.title}
+          </h3>
+          <div className="mt-1.5 text-xs text-[#EDE7DD] leading-snug">
+            {execStep?.detail}
+          </div>
+
+          <div className="mt-3 grid grid-cols-2 gap-2 text-xs pt-2.5 border-t border-[#2A2E35]">
+            <div className="p-2 rounded-lg bg-[#14161A] border border-[#3E7A5B]">
+              <div className="text-[9.5px] font-bold text-[#3E7A5B] uppercase">Base Mainnet</div>
+              <div className="text-[11px] font-semibold text-[#EDE7DD]">Definitive Flash</div>
+            </div>
+            <div className="p-2 rounded-lg bg-[#14161A] border border-dashed border-[#8A7B4E]">
+              <div className="text-[9.5px] font-bold text-[#8A7B4E] uppercase">Sepolia Sandbox</div>
+              <div className="text-[11px] font-semibold text-[#EDE7DD]">Uniswap V4</div>
+            </div>
+          </div>
+        </div>
+
+        <ChevronConduit orientation="vertical" />
+
+        {/* Mobile Step 3 */}
+        <div className="relative rounded-2xl border border-[#8C5A2B] bg-[#1C1F24] p-4 shadow-panel">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[#14161A] text-[#CBA135] border border-[#8C5A2B]">
+                <LockSimple size={13} weight="bold" />
+              </span>
+              <span className="label text-[#CBA135]">STAGE 03 · DYNAMIC AUTHORIZATION</span>
+            </div>
+            <span className="label text-[#8C5A2B] font-mono">2-OF-2 MPC</span>
+          </div>
+          <h3 className="font-display text-sm font-bold text-[#EDE7DD] tracking-tight">
+            {vaultStep?.title}
+          </h3>
+          <p className="mt-1.5 text-xs text-[#9B9690] leading-snug">
+            {vaultStep?.detail}
+          </p>
+          <div className="mt-3 pt-2 border-t border-[#2A2E35] flex items-center justify-between text-[11px]">
+            <span className="text-[#9B9690] font-medium">Dynamic Spend Limit</span>
+            <span className="num font-bold text-[#CBA135]">$50.00 Enforced</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
