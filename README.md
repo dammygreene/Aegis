@@ -12,6 +12,12 @@
 In under 15 seconds, judges can observe the complete causal chain on the live feed:
 $$\text{Agent Signal / Decision} \longrightarrow \text{Multi-Venue Execution (Uniswap + Flash)} \longrightarrow \text{Dynamic Wallet Authorization}$$
 
+## Demo
+
+[Watch the demo video](https://x.com/dammygreene/status/2101278594261528898)
+
+Live deployment: [https://aegis-hack.vercel.app/]
+
 ---
 
 ## Track Implementations & Code Pointers
