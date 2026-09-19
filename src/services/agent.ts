@@ -17,7 +17,7 @@ export class AutonomousAgentService {
   private cycleCounter = 0;
 
   private constructor() {
-    this.seedInitialHistory();
+    // History starts empty — only real executed cycles are added
   }
 
   public static getInstance(): AutonomousAgentService {
@@ -25,81 +25,6 @@ export class AutonomousAgentService {
       AutonomousAgentService.instance = new AutonomousAgentService();
     }
     return AutonomousAgentService.instance;
-  }
-
-  /**
-   * Pre-seeds demo history so the feed has rich initial evidence when loaded
-   */
-  private seedInitialHistory() {
-    this.feedHistory = [
-      {
-        id: 'cycle-001',
-        cycleNumber: 1,
-        timestamp: new Date(Date.now() - 1000 * 60 * 14).toISOString(),
-        scenarioName: 'System Bootstrap & Baseline Allocation',
-        signal: {
-          triggerType: 'manual_operator',
-          triggerCondition: 'Operator Bootstrap Trigger: Initial Pool Range Set [2,500 - 2,800]',
-          reasoning: 'Initializing initial liquidity bounds and setting up downside risk protection via Flash bracket order.',
-          metric: 'ETH Reference Price',
-          metricValue: '$2,642.50',
-          threshold: '$2,500.00 - $2,800.00',
-          timestamp: new Date(Date.now() - 1000 * 60 * 14).toLocaleTimeString(),
-        },
-        executions: [
-          {
-            id: 'uni-seed-1',
-            venue: 'Uniswap',
-            orderType: 'Liquidity Rebalance',
-            network: 'testnet',
-            networkName: 'Ethereum Sepolia',
-            chainId: 11155111,
-            pair: 'WETH/USDC',
-            side: 'buy',
-            amountIn: '0.005 WETH',
-            amountOut: '13.25 USDC',
-            txHash: '0x9c4fe182049d18fa7b49e2908849b28a9b1c098df900192384a8b7c6d5e4f3a2',
-            explorerUrl: 'https://sepolia.etherscan.io/tx/0x9c4fe182049d18fa7b49e2908849b28a9b1c098df900192384a8b7c6d5e4f3a2',
-            status: 'filled',
-          },
-          {
-            id: 'flash-seed-1',
-            venue: 'Definitive Flash',
-            orderType: 'Bracket Order',
-            network: 'mainnet',
-            networkName: 'Base Mainnet',
-            chainId: 8453,
-            pair: 'ETH/USDC',
-            side: 'buy',
-            amountIn: '10.00 USDC',
-            amountOut: '0.0037 WETH',
-            txHash: '0x3a7e5892ac192837bc940817290bca8192837461928475918237461928374619',
-            explorerUrl: 'https://basescan.org/tx/0x3a7e5892ac192837bc940817290bca8192837461928475918237461928374619',
-            status: 'active_bracket',
-            bracketDetails: {
-              entryPrice: '$2,642.50',
-              takeProfitPrice: '$3,150.00',
-              stopLossPrice: '$2,350.00',
-              salt: '0x7e819b1093847591028374619283746100000000000000000000000000000000',
-              signedMaxFromAmount: '0.0041',
-            },
-          },
-        ],
-        authorization: {
-          walletPattern: 'Server Wallet (2-of-2 MPC)',
-          walletAddress: dynamicWallet.getWalletAddress(),
-          spendCapUsd: 50,
-          currentSpendUsd: 10.00,
-          actionCostUsd: 10.00,
-          remainingSpendUsd: 40.00,
-          isAuthorized: true,
-          signatureScheme: 'ECDSA secp256k1 (MPC 2-of-2 Threshold)',
-          authLog: `[Dynamic:Server-Wallet-MPC] Authorized "Baseline Allocation" for $10.00. Session total: $10.00 / $50.00.`,
-          authTxHash: '0xauth829104fa8291',
-        },
-      },
-    ];
-    this.cycleCounter = 1;
   }
 
   /**
@@ -274,7 +199,8 @@ export class AutonomousAgentService {
 
   public resetFeed() {
     dynamicWallet.resetSpend();
-    this.seedInitialHistory();
+    this.feedHistory = [];
+    this.cycleCounter = 0;
   }
 }
 

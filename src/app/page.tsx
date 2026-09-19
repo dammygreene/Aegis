@@ -137,82 +137,15 @@ function RadialSpendGauge({
 }
 
 export default function AegisFeedPage() {
-  const [feed, setFeed] = useState<FeedCycle[]>([
-    {
-      id: 'cycle-001',
-      cycleNumber: 1,
-      timestamp: '2026-09-18T12:00:00.000Z',
-      scenarioName: 'System Bootstrap & Baseline Allocation',
-      signal: {
-        triggerType: 'manual_operator',
-        triggerCondition: 'Operator Bootstrap Trigger: Initial Pool Range Set [2,500 - 2,800]',
-        reasoning: 'Initializing initial liquidity bounds and setting up downside risk protection via Flash bracket order.',
-        metric: 'ETH Reference Price',
-        metricValue: '$2,642.50',
-        threshold: '$2,500.00 - $2,800.00',
-        timestamp: '12:00:00 PM',
-      },
-      executions: [
-        {
-          id: 'flash-seed-1',
-          venue: 'Definitive Flash',
-          orderType: 'Bracket Order',
-          network: 'mainnet',
-          networkName: 'Base Mainnet',
-          chainId: 8453,
-          pair: 'ETH/USDC',
-          side: 'buy',
-          amountIn: '10.00 USDC',
-          amountOut: '0.0037 WETH',
-          txHash: '0x3a7e5892ac192837bc940817290bca8192837461928475918237461928374619',
-          explorerUrl: 'https://basescan.org/tx/0x3a7e5892ac192837bc940817290bca81928374619284759182374619',
-          status: 'active_bracket',
-          bracketDetails: {
-            entryPrice: '$2,642.50',
-            takeProfitPrice: '$3,150.00',
-            stopLossPrice: '$2,350.00',
-            salt: '0x7e819b1093847591028374619283746100000000000000000000000000000000',
-            signedMaxFromAmount: '0.0041',
-          },
-        },
-        {
-          id: 'uni-seed-1',
-          venue: 'Uniswap',
-          orderType: 'Liquidity Rebalance',
-          network: 'testnet',
-          networkName: 'Ethereum Sepolia',
-          chainId: 11155111,
-          pair: 'WETH/USDC',
-          side: 'buy',
-          amountIn: '0.005 WETH',
-          amountOut: '13.25 USDC',
-          txHash: '0x9c4fe182049d18fa7b49e2908849b28a9b1c098df900192384a8b7c6d5e4f3a2',
-          explorerUrl: 'https://sepolia.etherscan.io/tx/0x9c4fe182049d18fa7b49e2908849b28a9b1c098df900192384a8b7c6d5e4f3a2',
-          status: 'filled',
-        },
-      ],
-      authorization: {
-        walletPattern: 'Server Wallet (2-of-2 MPC)',
-        walletAddress: '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1',
-        spendCapUsd: 50,
-        currentSpendUsd: 10.0,
-        actionCostUsd: 10.0,
-        remainingSpendUsd: 40.0,
-        isAuthorized: true,
-        signatureScheme: 'ECDSA secp256k1 (MPC 2-of-2 Threshold)',
-        authLog: '[Dynamic:Server-Wallet-MPC] Authorized "Baseline Allocation" for $10.00. Session total: $10.00 / $50.00.',
-        authTxHash: '0xauth829104fa8291',
-      },
-    },
-  ]);
+  const [feed, setFeed] = useState<FeedCycle[]>([]);
   const [status, setStatus] = useState<SystemStatus | null>(null);
   const [loading, setLoading] = useState(false);
   const [selectedScenario, setSelectedScenario] = useState<string>('volatility_spike');
   const [expandedDetails, setExpandedDetails] = useState<Record<string, boolean>>({});
   const [spend, setSpend] = useState<{ spendCapUsd: number; currentSpendUsd: number; remainingUsd: number }>({
     spendCapUsd: 50,
-    currentSpendUsd: 10,
-    remainingUsd: 40,
+    currentSpendUsd: 0,
+    remainingUsd: 50,
   });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
